@@ -6,28 +6,41 @@ This guide outlines the steps to deploy WSO2 API Manager on an OpenShift cluster
 
 The following table lists the Kubernetes resources and their equivalent or related concepts in OpenShift:
 
-| Kubernetes Kind         | OpenShift Equivalent    | Description                                                                                                                        |
-| ----------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| DeploymentConfig        | DeploymentConfig        | OpenShift-specific resource that extends Kubernetes deployments with additional features like triggers.                            |
-| Secret                  | Secret                  | Used to store and manage sensitive information.                                                                                    |
-| ServiceAccount          | ServiceAccount          | Represents an identity for processes that run in a Pod.                                                                            |
-| ConfigMap               | ConfigMap               | Used to store non-confidential data in key-value pairs.                                                                            |
-| Ingress                 | Route                   | OpenShift's Route resource extends Kubernetes Ingress capabilities for external access to services.                                |
-| Service                 | Service                 | Defines a logical set of Pods and a policy by which to access them.                                                                |
-| PersistentVolumeClaim   | PersistentVolumeClaim   | A request for storage by a user that applications can use.                                                                         |
-| Deployment              | Deployment              | Manages the deployment and scaling of a set of Pods.                                                                               |
-| StatefulSet             | StatefulSet             | Manages deployment and scaling of stateful applications.                                                                           |
-| DaemonSet               | DaemonSet               | Ensures all (or some) Nodes run a copy of a Pod.                                                                                   |
-| ReplicaSet              | ReplicaSet              | Maintains a stable set of replica Pods running at any given time.                                                                  |
-| Job                     | Job                     | Creates one or more Pods and ensures that a specified number of them successfully terminate.                                       |
-| CronJob                 | CronJob                 | Manages time-based Jobs, such as once at a specified point in time or repeatedly at a specified interval.                          |
-| Pod                     | Pod                     | The smallest deployable units of computing that can be created and managed.                                                        |
-| HorizontalPodAutoscaler | HorizontalPodAutoscaler | Automatically scales the number of Pods in a replication controller, deployment, or replica set based on observed CPU utilization. |
-| NetworkPolicy           | NetworkPolicy           | Specifies how groups of Pods are allowed to communicate with each other and other network endpoints.                               |
-| ResourceQuota           | ResourceQuota           | Provides constraints that limit aggregate resource consumption per namespace.                                                      |
-| LimitRange              | LimitRange              | Imposes constraints on the size of Pods and Container resources in a namespace.                                                    |
+| Kubernetes Kind         | OpenShift Equivalent            | Description                                                                                                                        |
+| ----------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| DeploymentConfig        | DeploymentConfig                | OpenShift-specific resource that extends Kubernetes deployments with additional features like triggers.                            |
+| Secret                  | Secret                          | Used to store and manage sensitive information.                                                                                    |
+| ServiceAccount          | ServiceAccount                  | Represents an identity for processes that run in a Pod.                                                                            |
+| ConfigMap               | ConfigMap                       | Used to store non-confidential data in key-value pairs.                                                                            |
+| **Ingress**             | **Route**                       | OpenShift's Route resource extends Kubernetes Ingress capabilities for external access to services.                                |
+| Service                 | Service                         | Defines a logical set of Pods and a policy by which to access them.                                                                |
+| PersistentVolumeClaim   | PersistentVolumeClaim           | A request for storage by a user that applications can use.                                                                         |
+| Deployment              | Deployment and DeploymentConfig | Manages the deployment and scaling of a set of Pods.                                                                               |
+| StatefulSet             | StatefulSet                     | Manages deployment and scaling of stateful applications.                                                                           |
+| DaemonSet               | DaemonSet                       | Ensures all (or some) Nodes run a copy of a Pod.                                                                                   |
+| ReplicaSet              | ReplicaSet                      | Maintains a stable set of replica Pods running at any given time.                                                                  |
+| Job                     | Job                             | Creates one or more Pods and ensures that a specified number of them successfully terminate.                                       |
+| CronJob                 | CronJob                         | Manages time-based Jobs, such as once at a specified point in time or repeatedly at a specified interval.                          |
+| Pod                     | Pod                             | The smallest deployable units of computing that can be created and managed.                                                        |
+| HorizontalPodAutoscaler | HorizontalPodAutoscaler         | Automatically scales the number of Pods in a replication controller, deployment, or replica set based on observed CPU utilization. |
+| NetworkPolicy           | NetworkPolicy                   | Specifies how groups of Pods are allowed to communicate with each other and other network endpoints.                               |
+| ResourceQuota           | ResourceQuota                   | Provides constraints that limit aggregate resource consumption per namespace.                                                      |
+| LimitRange              | LimitRange                      | Imposes constraints on the size of Pods and Container resources in a namespace.                                                    |
 
 Note: OpenShift is built on Kubernetes and supports all Kubernetes resources, along with additional OpenShift-specific resources.
+
+| Openshift Resource    | Kubernetes Equivalent | Openshift `apiVersion`  | Kubernetes `apiVersion` | Notes                                                                                |
+| --------------------- | --------------------- | ----------------------- | ----------------------- | ------------------------------------------------------------------------------------ |
+| DeploymentConfig      | Deployment            | `apps.openshift.io/v1`  | `apps/v1`               | DeploymentConfig provides additional features like triggers for OpenShift.           |
+| Route                 | Ingress               | `route.openshift.io/v1` | `networking.k8s.io/v1`  | Route is an OpenShift-specific resource that provides advanced routing capabilities. |
+| BuildConfig           | Not applicable        | `build.openshift.io/v1` | Not applicable          | BuildConfig is specific to OpenShift for building applications from source code.     |
+| ImageStream           | Not applicable        | `image.openshift.io/v1` | Not applicable          | ImageStream is specific to OpenShift for managing Docker images.                     |
+| Secret                | Secret                | `v1`                    | `v1`                    | Identical in both Kubernetes and OpenShift.                                          |
+| ServiceAccount        | ServiceAccount        | `v1`                    | `v1`                    | Identical in both Kubernetes and OpenShift.                                          |
+| ConfigMap             | ConfigMap             | `v1`                    | `v1`                    | Identical in both Kubernetes and OpenShift.                                          |
+| Service               | Service               | `v1`                    | `v1`                    | Identical in both Kubernetes and OpenShift.                                          |
+| PersistentVolumeClaim | PersistentVolumeClaim | `v1`                    | `v1`                    | Identical in both Kubernetes and OpenShift.                                          |
+| Deployment            | Deployment            | `apps/v1`               | `apps/v1`               | OpenShift supports Kubernetes Deployments directly.                                  |
 
 ## Prerequisites
 
