@@ -2,16 +2,46 @@
 
 This guide outlines the steps to deploy WSO2 API Manager on an OpenShift cluster using the provided Helm chart.
 
+# Kubernetes to OpenShift Resource Mapping
+
+The following table lists the Kubernetes resources and their equivalent or related concepts in OpenShift:
+
+| Kubernetes Kind         | OpenShift Equivalent    | Description                                                                                                                        |
+| ----------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| DeploymentConfig        | DeploymentConfig        | OpenShift-specific resource that extends Kubernetes deployments with additional features like triggers.                            |
+| Secret                  | Secret                  | Used to store and manage sensitive information.                                                                                    |
+| ServiceAccount          | ServiceAccount          | Represents an identity for processes that run in a Pod.                                                                            |
+| ConfigMap               | ConfigMap               | Used to store non-confidential data in key-value pairs.                                                                            |
+| Ingress                 | Route                   | OpenShift's Route resource extends Kubernetes Ingress capabilities for external access to services.                                |
+| Service                 | Service                 | Defines a logical set of Pods and a policy by which to access them.                                                                |
+| PersistentVolumeClaim   | PersistentVolumeClaim   | A request for storage by a user that applications can use.                                                                         |
+| Deployment              | Deployment              | Manages the deployment and scaling of a set of Pods.                                                                               |
+| StatefulSet             | StatefulSet             | Manages deployment and scaling of stateful applications.                                                                           |
+| DaemonSet               | DaemonSet               | Ensures all (or some) Nodes run a copy of a Pod.                                                                                   |
+| ReplicaSet              | ReplicaSet              | Maintains a stable set of replica Pods running at any given time.                                                                  |
+| Job                     | Job                     | Creates one or more Pods and ensures that a specified number of them successfully terminate.                                       |
+| CronJob                 | CronJob                 | Manages time-based Jobs, such as once at a specified point in time or repeatedly at a specified interval.                          |
+| Pod                     | Pod                     | The smallest deployable units of computing that can be created and managed.                                                        |
+| HorizontalPodAutoscaler | HorizontalPodAutoscaler | Automatically scales the number of Pods in a replication controller, deployment, or replica set based on observed CPU utilization. |
+| NetworkPolicy           | NetworkPolicy           | Specifies how groups of Pods are allowed to communicate with each other and other network endpoints.                               |
+| ResourceQuota           | ResourceQuota           | Provides constraints that limit aggregate resource consumption per namespace.                                                      |
+| LimitRange              | LimitRange              | Imposes constraints on the size of Pods and Container resources in a namespace.                                                    |
+
+Note: OpenShift is built on Kubernetes and supports all Kubernetes resources, along with additional OpenShift-specific resources.
+
 ## Prerequisites
 
 - OpenShift cluster with sufficient resources to host WSO2 API Manager and its components.
-  per AM node:
-  requests:
+  Per AM node:
+
+  ```yaml
+    requests:
   memory: "4Gi"
   cpu: "2000m"
   limits:
   memory: "4Gi"
   cpu: "2000m"
+  ```
 
 - Helm 3.x installed and configured.
 - OpenShift CLI (oc) installed and configured.
