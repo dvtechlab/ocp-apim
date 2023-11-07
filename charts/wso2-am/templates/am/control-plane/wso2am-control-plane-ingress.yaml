@@ -14,8 +14,8 @@
 
 {{- if .Values.wso2.deployment.am.cp.ingress.enabled }}
 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: route.openshift.io/v1
+kind: Route
 metadata:
   name: {{ template "wso2am.resource.prefix" . }}-cp-ingress
   namespace : {{ .Release.Namespace }}

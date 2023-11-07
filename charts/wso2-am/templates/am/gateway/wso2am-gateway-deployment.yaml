@@ -110,7 +110,7 @@ spec:
             memory: {{ .Values.wso2.deployment.am.resources.limits.memory }}
             cpu: {{ .Values.wso2.deployment.am.resources.limits.cpu }}
         securityContext:
-          runAsUser: 802
+          runAsUser: 1000710000
         ports:
         - containerPort: 8280
           protocol: TCP
