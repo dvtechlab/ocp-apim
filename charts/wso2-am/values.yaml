@@ -19,7 +19,7 @@ wso2:
   subscription:
     username: ""
     password: ""
-  
+
   # WSO2 Choreo Analytics Parameters
   # If provided, these parameters will be used publish analytics data to Choreo Analytics environment (https://apim.docs.wso2.com/en/latest/observe/api-manager-analytics/configure-analytics/register-for-analytics/).
   choreoAnalytics:
@@ -57,9 +57,9 @@ wso2:
     am:
       # Container image configurations
       # If a custom image must be used, uncomment 'dockerRegistry' and provide its value
-      dockerRegistry: "wso2ob.azurecr.io"
-      imageName: "tv-obapim-uk"
-      imageTag: "1.0.0"
+      dockerRegistry: "hub.docker.com"
+      imageName: "wso2am"
+      imageTag: "latest"
       # Refer to the Kubernetes documentation on updating images (https://kubernetes.io/docs/concepts/containers/images/#updating-images)
       imagePullPolicy: Always
 
@@ -155,7 +155,7 @@ wso2:
 
       # API Manager's Control Plane specific configurations
       cp:
-        db: 
+        db:
           hostname: wso2-mysql-db
           port: 3306
         # Kubernetes Probes

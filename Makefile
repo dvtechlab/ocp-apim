@@ -3,3 +3,6 @@ helm upgrade --install wso2am-dev charts/wso2-am --version 4.2.0-1 --namespace d
 
 
 oc get replicaset -n dev
+
+
+oc describe replicaset [replicaset-name] -n dev
