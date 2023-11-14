@@ -30,7 +30,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.wso2.deployment.am.cp.ingress.hostname }}
-    secretName: wso2am-cp-tls-secret
+    secretName: {{ template "wso2am.resource.prefix" . }}-cp-tls-secret
   rules:
   - host: {{ .Values.wso2.deployment.am.cp.ingress.hostname }}
     http:
@@ -39,7 +39,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ template "wso2am.resource.prefix" . }}-cp-service
+            name: {{ template "wso2am.resource.prefix" . }}-service
             port:
               number: 9443
 {{- end -}}

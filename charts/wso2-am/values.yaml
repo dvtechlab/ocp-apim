@@ -57,9 +57,9 @@ wso2:
     am:
       # Container image configurations
       # If a custom image must be used, uncomment 'dockerRegistry' and provide its value
-      dockerRegistry: "hub.docker.com"
+      dockerRegistry: "wso2"
       imageName: "wso2am"
-      imageTag: "latest"
+      imageTag: "4.0.0-alpine"
       # Refer to the Kubernetes documentation on updating images (https://kubernetes.io/docs/concepts/containers/images/#updating-images)
       imagePullPolicy: Always
 
@@ -122,7 +122,7 @@ wso2:
       gateway:
         # Configure Ingress
         ingress:
-          enabled: true
+          enabled: false
           # Name of the IngressClass to use
           className: "nginx"
           # Hostname for Gateway profile
@@ -180,7 +180,7 @@ wso2:
 
         # Configure Ingress
         ingress:
-          enabled: true
+          enabled: false
           # Name of the IngressClass to use
           className: "nginx"
           # Hostname for Control Plane profile

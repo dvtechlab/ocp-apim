@@ -1,8 +1,23 @@
-helm install wso2am-dev charts/wso2-am --version 4.2.0-1 --namespace dev
-helm upgrade --install wso2am-dev charts/wso2-am --version 4.2.0-1 --namespace dev
+-include keystores/Makefile
 
+ENVIRONMENT=dev
+WSO2_AM_CHART_PATH=charts/wso2-am
+APP_NAME=etisalat-am
 
-oc get replicaset -n dev
+APP_NAMESPACE=dev-wso2
+APP_RELEASE_NAME=$(ENVIRONMENT)-$(APP_NAME)
 
+lint-etisalat-am-app:
+	helm lint $(WSO2_AM_CHART_PATH) -f $(WSO2_AM_CHART_PATH)/values.yaml --with-subcharts
 
-oc describe replicaset [replicaset-name] -n dev
+install-etisalat-am-app:
+	helm upgrade --install $(APP_RELEASE_NAME) $(WSO2_AM_CHART_PATH) \
+		--dependency-update \
+		--create-namespace \
+		--namespace $(APP_NAMESPACE)
+
+uninstall-etisalat-am-app:
+	- helm uninstall $(APP_RELEASE_NAME) --namespace $(APP_NAMESPACE)
+	- kubectl delete ns $(APP_NAMESPACE)
+
+-include overrides.mk

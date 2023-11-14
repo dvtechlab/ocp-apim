@@ -17,7 +17,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "wso2am.resource.prefix" . }}-cp-conf-entrypoint
+  name: {{ template "wso2am.resource.prefix" . }}-docker-entrypoint
   namespace: {{ .Release.Namespace }}
 data:
   docker-entrypoint.sh: |

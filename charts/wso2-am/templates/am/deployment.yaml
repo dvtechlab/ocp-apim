@@ -15,7 +15,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "wso2am.resource.prefix" . }}-cp
+  name: {{ template "wso2am.resource.prefix" . }}-all-in-one
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
@@ -23,35 +23,36 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      deployment: {{ template "wso2am.resource.prefix" . }}-cp
-      node: {{ template "wso2am.resource.prefix" . }}-cp
+      deployment: {{ template "wso2am.resource.prefix" . }}-all-in-one
+      node: {{ template "wso2am.resource.prefix" . }}-all-in-one
   template:
     metadata:
       annotations:
-        checksum.am.conf: {{ include (print $.Template.BasePath "/am/control-plane/wso2am-control-plane-conf.yaml") . | sha256sum }}
+        checksum.am.conf: {{ include (print $.Template.BasePath "/am/deployment-conf.yaml") . | sha256sum }}
       labels:
-        deployment: {{ template "wso2am.resource.prefix" . }}-cp
-        node: {{ template "wso2am.resource.prefix" . }}-cp
+        deployment: {{ template "wso2am.resource.prefix" . }}-all-in-one
+        node: {{ template "wso2am.resource.prefix" . }}-all-in-one
         product: apim
     spec:
-      initContainers:
-        - name: init-db
-          image: busybox:1.32
-          command: ['sh', '-c', 'echo -e "Checking for the availability of DB Server deployment"; while ! nc -z "{{ .Values.wso2.deployment.am.cp.db.hostname }}" {{ .Values.wso2.deployment.am.cp.db.port }}; do sleep 1; printf "-"; done; echo -e "  >> DB Server has started";']
-        - name: init-db-connector-download
-          image: busybox:1.32
-          command:
-            - /bin/sh
-            - "-c"
-            - |
-              set -e
-              connector_version=8.0.30
-              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /db-connector-jar/ 
-          volumeMounts:
-            - name: db-connector-jar
-              mountPath: /db-connector-jar
+      serviceAccountName: {{ .Values.kubernetes.serviceAccount }}
+      # initContainers:
+      #   - name: init-db
+      #     image: busybox:1.32
+      #     command: ['sh', '-c', 'echo -e "Checking for the availability of DB Server deployment"; while ! nc -z "{{ .Values.wso2.deployment.am.cp.db.hostname }}" {{ .Values.wso2.deployment.am.cp.db.port }}; do sleep 1; printf "-"; done; echo -e "  >> DB Server has started";']
+      #   - name: init-db-connector-download
+      #     image: busybox:1.32
+      #     command:
+      #       - /bin/sh
+      #       - "-c"
+      #       - |
+      #         set -e
+      #         connector_version=8.0.30
+      #         wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /db-connector-jar/ 
+      #     volumeMounts:
+      #       - name: db-connector-jar
+      #         mountPath: /db-connector-jar
       containers:
-        - name: wso2am-cp
+        - name: {{ template "wso2am.resource.prefix" . }}-all-in-one
 {{- include "image" (dict "Values" .Values "deployment" .Values.wso2.deployment.am) | indent 10 }}
           imagePullPolicy: {{ .Values.wso2.deployment.am.imagePullPolicy }}
           # startupProbe:
@@ -86,25 +87,29 @@ spec:
               memory: {{ .Values.wso2.deployment.am.cp.resources.limits.memory }}
               cpu: {{ .Values.wso2.deployment.am.cp.resources.limits.cpu }}
           securityContext:
-              allowPrivilegeEscalation: false
-              runAsNonRoot: true
-              capabilities:
-                drop:
-                - ALL
+            runAsUser: 802
+            allowPrivilegeEscalation: false            
+            runAsNonRoot: true 
+            seccompProfile: 
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]           
           ports:
             - containerPort: 9763
-              protocol: "TCP"
+              protocol: TCP
             - containerPort: 9443
-              protocol: "TCP"
+              protocol: TCP
+            - containerPort: 8280
+              protocol: TCP
+            - containerPort: 8243
+              protocol: TCP
             - containerPort: 9711
-              protocol: "TCP"
+              protocol: TCP
             - containerPort: 9611
-              protocol: "TCP"
+              protocol: TCP
             - containerPort: 5672
-              protocol: "TCP"
+              protocol: TCP
           env:
-            - name: PROFILE_NAME
-              value: control-plane
             - name: NODE_IP
               valueFrom:
                 fieldRef:
@@ -114,15 +119,15 @@ spec:
             - name: KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: wso2am-keystore-password
+                  name: dev-etisalat-am-keystore-password
                   key: password
             - name: TRUSTSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: wso2am-client-truststore-password
+                  name: dev-etisalat-am-client-truststore-password
                   key: password
           volumeMounts:
-            - name: wso2am-conf
+            - name: {{ template "wso2am.resource.prefix" . }}-conf
               mountPath: /home/wso2carbon/wso2-config-volume/repository/conf
             - name: keystore
               mountPath: /home/wso2carbon/wso2-artifact-volume/repository/resources/security/wso2carbon.jks
@@ -133,17 +138,16 @@ spec:
               subPath: client-truststore.jks
               readOnly: true
             {{ if .Values.wso2.deployment.persistentRuntimeArtifacts.apacheSolrIndexing.enabled }}
-            - name: wso2am-local-carbon-database-storage
+            - name: {{ template "wso2am.resource.prefix" . }}-local-carbon-database-storage
               mountPath: /home/wso2carbon/solr/database
-            - name: wso2am-solr-indexed-data-storage
+            - name: {{ template "wso2am.resource.prefix" . }}-solr-indexed-data-storage
               mountPath: /home/wso2carbon/solr/indexed-data
-            - name: wso2am-conf-entrypoint
+            - name: {{ template "wso2am.resource.prefix" . }}-docker-entrypoint
               mountPath: /home/wso2carbon/docker-entrypoint.sh
               subPath: docker-entrypoint.sh
             {{ end }}
             - name: db-connector-jar
-              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/lib
-      serviceAccountName: {{ .Values.kubernetes.serviceAccount }}
+              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/lib      
       {{- if .Values.wso2.deployment.am.imagePullSecrets }}
       imagePullSecrets:
         - name: {{ .Values.wso2.deployment.am.imagePullSecrets }}
@@ -152,25 +156,25 @@ spec:
         - name: {{ template "wso2am.resource.prefix" . }}-wso2-private-registry-creds
       {{ end }}
       volumes:
-        - name: wso2am-conf
+        - name: {{ template "wso2am.resource.prefix" . }}-conf
           configMap:
-            name: {{ template "wso2am.resource.prefix" . }}-cp-conf
+            name: {{ template "wso2am.resource.prefix" . }}-deployment-conf
         - name: keystore
           secret:
-            secretName: wso2am-wso2carbon-jks
+            secretName: dev-etisalat-am-wso2carbon-jks
         - name: truststore
           secret:
-            secretName: wso2am-client-truststore-jks
+            secretName: dev-etisalat-am-client-truststore-jks
         {{ if .Values.wso2.deployment.persistentRuntimeArtifacts.apacheSolrIndexing.enabled }}
-        - name: wso2am-local-carbon-database-storage
+        - name: {{ template "wso2am.resource.prefix" . }}-local-carbon-database-storage
           persistentVolumeClaim:
-            claimName: {{ template "wso2am.resource.prefix" . }}-cp-local-carbon-database-volume-claim
-        - name: wso2am-solr-indexed-data-storage
+            claimName: {{ template "wso2am.resource.prefix" . }}-local-carbon-database-volume-claim
+        - name: {{ template "wso2am.resource.prefix" . }}-solr-indexed-data-storage
           persistentVolumeClaim:
-            claimName: {{ template "wso2am.resource.prefix" . }}-cp-solr-indexed-data-volume-claim
-        - name: wso2am-conf-entrypoint
+            claimName: {{ template "wso2am.resource.prefix" . }}-solr-indexed-data-volume-claim
+        - name: {{ template "wso2am.resource.prefix" . }}-docker-entrypoint
           configMap:
-            name: {{ template "wso2am.resource.prefix" . }}-cp-conf-entrypoint
+            name: {{ template "wso2am.resource.prefix" . }}-docker-entrypoint
             defaultMode: 0407
         {{ end }}
         - name: db-connector-jar

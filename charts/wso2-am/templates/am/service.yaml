@@ -15,15 +15,21 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "wso2am.resource.prefix" . }}-cp-service
+  name: {{ template "wso2am.resource.prefix" . }}-service
   namespace : {{ .Release.Namespace }}
 spec:
   # label keys and values that must match in order to receive traffic for this service
   selector:
-    deployment: {{ template "wso2am.resource.prefix" . }}-cp
-    node: {{ template "wso2am.resource.prefix" . }}-cp
+    deployment: {{ template "wso2am.resource.prefix" . }}-all-in-one
+    node: {{ template "wso2am.resource.prefix" . }}-all-in-one
   ports:
   # ports that this service should serve on
+  - name: pass-through-http
+    protocol: TCP
+    port: 8280
+  - name: pass-through-https
+    protocol: TCP
+    port: 8243
   - name: servlet-http
     protocol: TCP
     port: 9763
@@ -39,3 +45,9 @@ spec:
   - name: jms-tcp
     protocol: TCP
     port: 5672
+  - name: websub-http
+    protocol: TCP
+    port: 9021
+  - name: websub-https
+    protocol: TCP
+    port: 8021
