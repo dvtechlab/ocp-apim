@@ -1,3 +1,5 @@
+helm install wso2am-dev . --version 4.2.0 --namespace dev
+
 # WSO2 API Manager Deployment on OpenShift
 
 This guide outlines the steps to deploy WSO2 API Manager on an OpenShift cluster using the provided Helm chart.
